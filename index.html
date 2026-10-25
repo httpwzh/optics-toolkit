@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>光学工程工具箱 · 在线光束与光纤计算</title>
+<meta name="description" content="免费的光学工程在线计算工具：激光聚焦、多透镜与反射镜传输、光纤绕纤及熔接损耗。浏览器本地计算，公式与适用范围透明。">
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="assets/calculator.css">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip-link" href="#tools">跳转到计算工具</a>
+<div class="app">
+  <header class="hero"><div><div class="eyebrow">OPTICAL ENGINEERING TOOLKIT</div><h1>光学工程工具箱</h1><p>激光光斑、聚焦、多透镜 / 反射镜高斯光束传输、光纤参数与熔接损耗的快速工程估算</p></div><div class="badge">公开测试版 · 本地计算</div></header>
+  <div class="site-intro">面向光学工程师的快速估算与方案比较工具。<a href="guide.html">使用说明 / 模型局限 / 隐私说明</a></div>
+  <nav class="tabs" id="tools" aria-label="计算工具"><button class="tab active" data-tab="spot">激光光斑与聚焦</button><button class="tab" data-tab="multi">多透镜 / 反射镜光束传输</button><button class="tab" data-tab="fiber">光纤参数与绕纤损耗</button><button class="tab" data-tab="splice">光纤熔接损耗</button></nav>
+  <section id="spot" class="layout">
+    <form class="panel" id="spotForm"><h2>输入参数</h2><p class="sub">适用于圆对称、近轴、高斯光束的场镜/薄透镜快速估算。</p>
+      <h3>激光与入射光束</h3>
+      <div class="field"><label>波长 <span>λ</span></label><div class="inputrow"><input id="s_lambda" type="number" value="1070" min="0.001" step="any"><select id="s_lambda_u"><option value="nm">nm</option><option value="um">μm</option></select></div></div>
+      <div class="field"><label>激光功率 <span>用于峰值功率密度</span></label><div class="inputrow"><input id="s_power" type="number" value="1000" min="0" step="any"><select id="s_power_u"><option value="W">W</option><option value="kW">kW</option></select></div></div>
+      <div class="field" data-show="s_mode!=fiber"><label>光束质量 M² <span>M² ≥ 1</span></label><div class="inputrow"><input id="s_m2" type="number" value="1.3" min="1" step="any"></div></div>
+      <div class="field"><label for="s_mode">入射方式 <span>决定入射光束的描述方式</span></label><div class="inputrow"><select id="s_mode" class="wide"><option value="col">准直光：已知透镜处光束直径</option><option value="waist">已知束腰：束腰直径与位置</option><option value="fiber">传能光纤输出：光纤 + 准直镜</option></select></div></div>
+      <div class="field" data-show="s_mode=fiber"><label>传能光纤芯径 <span>输出端面近场直径</span></label><div class="inputrow"><input id="s_fcore" type="number" value="50" min="0.1" step="any"><span class="unit">μm</span></div></div>
+      <div class="field" data-show="s_mode=fiber"><label>光纤输出 NA <span>实测/规格的光束 NA（远场半角正弦），非光纤结构 NA</span></label><div class="inputrow"><input id="s_fna" type="number" value="0.1" min="0.0001" max="0.9" step="any"></div></div>
+      <div class="field" data-show="s_mode=fiber"><label>准直镜焦距 f_c <span>光纤端面位于其前焦面</span></label><div class="inputrow"><input id="s_fc" type="number" value="100" min="0.01" step="any"><span class="unit">mm</span></div></div>
+      <div class="field" data-show="s_mode=fiber"><label>准直镜到聚焦镜距离 <span>影响焦点位置，不影响焦斑大小</span></label><div class="inputrow"><input id="s_fgap" type="number" value="100" min="0" step="any"><span class="unit">mm</span></div></div>
+      <div class="field"><label for="s_prof">焦斑能量分布 <span>影响峰值功率密度</span></label><div class="inputrow"><select id="s_prof" class="wide"><option value="auto">自动：M² ≤ 3 按高斯，否则按平顶</option><option value="gauss">高斯（I₀ = 2P/πw²）</option><option value="flat">平顶（I = P/πw²，多模光纤成像）</option></select></div></div>
+      <div class="field" data-show="s_mode=waist"><label>入射束腰直径 2w₀₁ <span>1/e² 直径</span></label><div class="inputrow"><input id="s_w0in" type="number" value="2" min="0.0001" step="any"><select id="s_w0in_u"><option value="mm">mm</option><option value="um">μm</option></select></div></div>
+      <div class="field" data-show="s_mode=waist"><label>束腰到透镜距离 s <span>束腰在透镜前为正，在后为负</span></label><div class="inputrow"><input id="s_s" type="number" value="300" step="any"><select id="s_s_u"><option value="mm">mm</option><option value="m">m</option></select></div></div>
+      <div class="field" data-show="s_mode=col"><label>透镜处入射光束直径 <span>1/e² 直径</span></label><div class="inputrow"><input id="s_din" type="number" value="15" min="0.001" step="any"><select id="s_din_u"><option value="mm">mm</option><option value="um">μm</option></select></div></div>
+      <div class="field"><label>脉冲重频 <span>0 表示连续光</span></label><div class="inputrow"><input id="s_rep" type="number" value="0" min="0" step="any"><span class="unit">kHz</span></div></div>
+      <div class="field" data-show="s_rep!=0"><label>脉冲宽度 <span>FWHM，按矩形脉冲估算峰值功率</span></label><div class="inputrow"><input id="s_tau" type="number" value="100" min="0" step="any"><select id="s_tau_u"><option value="ns">ns</option><option value="ps">ps</option><option value="fs">fs</option></select></div></div>
+      <h3>场镜 / 聚焦透镜</h3>
+      <div class="field"><label>焦距 <span>f</span></label><div class="inputrow"><input id="s_f" type="number" value="160" min="0.001" step="any"><select id="s_f_u"><option value="mm">mm</option><option value="m">m</option></select></div></div>
+      <div class="field"><label for="s_lens">透镜类型 <span>用于球差估算</span></label><div class="inputrow"><select id="s_lens" class="wide"><option value="ideal">已校正：非球面 / 场镜 / 消像差镜组</option><option value="pcx">单片球面平凸透镜（凸面朝平行光）</option></select></div></div>
+      <div class="field"><label>观察面位置 <span>从透镜后表面起算</span></label><div class="inputrow"><input id="s_z" type="number" value="160" step="any"><select id="s_z_u"><option value="mm">mm</option><option value="m">m</option></select></div></div>
+      <div class="field"><label>透镜有效口径 <span>用于截光检查</span></label><div class="inputrow"><input id="s_ap" type="number" value="20" min="0.001" step="any"><select id="s_ap_u"><option value="mm">mm</option><option value="m">m</option></select></div></div>
+      <div class="btnrow"><button class="primary" type="submit">计算光斑与聚焦</button><button class="secondary" type="button" data-copy="spot">复制结果</button><button class="secondary" type="button" data-reset="spotForm">恢复默认</button></div><div id="spotErr" class="error" role="alert"></div>
+    </form>
+    <div class="panel"><h2>计算结果</h2><p class="sub">结果采用 1/e² 光斑定义；焦点位置为透镜后距离。</p><div class="resultTop"><div class="metric"><small>理论焦斑直径</small><strong id="o_spot">—</strong><em>μm</em></div><div class="metric"><small>像方束腰位置（透镜后）</small><strong id="o_focus">—</strong><em>mm</em></div><div class="metric"><small>瑞利长度</small><strong id="o_zr">—</strong><em>mm</em></div><div class="metric"><small>发散半角</small><strong id="o_theta">—</strong><em>mrad</em></div></div><div class="resultbox"><h3>离焦位置光斑</h3><div class="metric"><small>观察面光斑直径</small><strong id="o_zspot">—</strong><em>μm</em></div><div class="range">观察面相对束腰的离焦量：<b id="o_defocus">—</b> mm；中心峰值功率密度：<b id="o_intensity">—</b> MW/cm²（<b id="o_intensity2">—</b> W/mm²，<span id="o_proflbl">—</span>）</div><div class="range" id="o_more"></div><div class="range">BPP = <b id="o_bpp">—</b> mm·mrad；入射光束瑞利长度 zR,in = <b id="o_zrin">—</b> m；焦距 f 处光斑直径 <b id="o_fspot">—</b> μm；透镜口径/光束直径 = <b id="o_aprat">—</b></div><div class="range">透镜处光束直径 <b id="o_dl">—</b> mm；入射发散半角 <b id="o_thin">—</b> mrad；束腰放大率 m = <b id="o_mag">—</b>；<span id="o_georef_l">几何参考点</span> <b id="o_georef">—</b> mm，高斯束腰与其相差 <b id="o_gdiff">—</b> mm；像方束腰距离上限 s″max = <b id="o_s2max">—</b> mm（s = f + zR₁ = <b id="o_smax">—</b> mm 时）</div></div><div class="resultbox"><h3>光斑随位置变化</h3><div class="chartwrap"><canvas id="spotChart" class="chart fiberchart" role="img" aria-label="光斑直径（μm）随透镜后位置（mm）变化"></canvas><div id="spotTip" class="charttip" aria-live="polite" hidden></div></div><div class="legend"><span><i class="dot"></i>光斑直径（1/e²）</span><span><i class="dot orange"></i>橙色虚线：最小光斑直径 d₀</span><span>浅橙区域：束腰 ±zR</span><span><i class="dot" style="background:#14804a"></i>绿色点线：观察面</span></div><p class="sub" style="margin:4px 0 0">横轴为透镜后位置，纵轴为 1/e² 光斑直径。浅橙区域为瑞利长度范围（总宽 2zR），边界光斑直径为 √2 d₀。悬停或点击绘图区可查看具体数值。</p></div><div class="resultbox"><h3>像方束腰位置 s″ 随束腰距离 s 变化</h3><div class="chartwrap"><canvas id="imgChart" class="chart fiberchart" role="img" aria-label="像方束腰位置 s″（mm）随入射束腰到透镜距离 s（mm）变化，对比几何成像"></canvas><div id="imgTip" class="charttip" aria-live="polite" hidden></div></div><div class="legend"><span><i class="dot"></i>高斯束 s″</span><span><i class="dot orange"></i>橙色虚线：几何成像 1/s + 1/s″ = 1/f</span><span><i class="dot" style="background:#14804a"></i>当前 s</span><span>灰色虚线：s = f、s″ = f</span></div><p class="sub" style="margin:4px 0 0">高斯束的像距有上限 s″max = f + f²/(2zR₁)，在 s = f + zR₁ 时取得；s = f 时束腰正好位于后焦面。几何曲线在 s = f 处发散，高斯束不会。纵轴限制在合理范围内，悬停可查看数值。</p></div><div id="spotNotice" class="notice"></div><div class="resultbox"><h3>公式与适用范围</h3><div class="formula">高斯束薄透镜变换（Self 1983，嵌入 M²）：
+zR₁ = π w01² / (M² λ)                  入射束腰 w01 位于透镜前 s 处
+s″  = f + f²(s − f) / [(s − f)² + zR₁²] 像方束腰位置（透镜后）
+m   = f / √[(s − f)² + zR₁²]           w02 = m·w01，zR₂ = m²·zR₁
+wL  = w01 √[1 + (s / zR₁)²]             透镜处光斑半径（口径检查）
+s″max = f + f²/(2zR₁)，在 s = f + zR₁ 时取得
+准直光：s = 0，w01 = wL ⇒ w02 = wL/√[1 + (zR₁/f)²]，s″ = f/[1 + (f/zR₁)²]
+θ = M² λ / (π w02)，BPP = w02·θ
+w(z) = w0 √[1 + ((z − z0) / zR)²]
+I0 = 2P / (π w²)（高斯）；I = P / (π w²)（平顶，多模光纤近场成像）
+传能光纤输出：BPP = (d_core/2)·NA，M² = π·BPP/λ；准直后 D_c ≈ 2·f_c·NA，焦斑 ≈ d_core·f/f_c
+脉冲：E_p = P/f_rep，P_pk ≈ E_p/τ，能量密度 F = 2E_p/(π w²)（高斯峰值）
+球差（单片平凸、凸面朝平行光、n≈1.5，Melles Griot 经验式）：弥散斑直径 ≈ 0.067·f/F#³，F# = f/D（D 取 1/e² 光束直径）；与衍射焦斑按平方和粗略合成，熔石英透镜略大
+
+模型：圆对称高斯束（嵌入 M² 模型）、薄透镜、近轴传播；厚透镜或镜组的 s、s″ 应从对应主面起算。s < 0 表示会聚光入射（虚物）。当 zR₁ 与 |s − f| 可比时，像方束腰明显偏离几何像点。未计入场镜像差、热透镜、截光衍射、偏振、装调误差和实际 M² 测量误差。结果是工程估算值，应以光斑仪实测确认。</div></div></div>
+  </section>
+  <section id="multi" class="layout hidden">
+    <form class="panel" id="multiForm"><h2>输入参数</h2><p class="sub">近轴高斯光束（嵌入 M²）依次通过薄透镜和球面反射镜。反射镜按展开光路处理，位置为自起始面 z = 0 起算的展开光程。斜入射反射镜会引入像散，x（水平）与 y（竖直）方向分别计算。</p>
+      <h3>激光与入射光束</h3>
+      <div class="field"><label>波长 <span>λ</span></label><div class="inputrow"><input id="m_lambda" type="number" value="1070" min="0.001" step="any"><select id="m_lambda_u"><option value="nm">nm</option><option value="um">μm</option></select></div></div>
+      <div class="field"><label>激光功率 <span>用于峰值功率密度</span></label><div class="inputrow"><input id="m_power" type="number" value="1000" min="0" step="any"><select id="m_power_u"><option value="W">W</option><option value="kW">kW</option></select></div></div>
+      <div class="field"><label>光束质量 M² <span>M² ≥ 1</span></label><div class="inputrow"><input id="m_m2" type="number" value="1.3" min="1" step="any"></div></div>
+      <div class="field"><label for="m_mode">入射方式</label><div class="inputrow"><select id="m_mode" class="wide"><option value="col">准直光：束腰位于起始面 z = 0</option><option value="waist">已知束腰：束腰直径与位置</option></select></div></div>
+      <div class="field" data-show="m_mode=col"><label>起始面光束直径 <span>1/e² 直径</span></label><div class="inputrow"><input id="m_din" type="number" value="3" min="0.0001" step="any"><select id="m_din_u"><option value="mm">mm</option><option value="um">μm</option></select></div></div>
+      <div class="field" data-show="m_mode=waist"><label>入射束腰直径 2w₀ <span>1/e² 直径</span></label><div class="inputrow"><input id="m_w0in" type="number" value="20" min="0.0001" step="any"><select id="m_w0in_u"><option value="um">μm</option><option value="mm">mm</option></select></div></div>
+      <div class="field" data-show="m_mode=waist"><label>入射束腰位置 z_w <span>负值表示在起始面之前</span></label><div class="inputrow"><input id="m_zw" type="number" value="0" step="any"><span class="unit">mm</span></div></div>
+      <h3>光学元件（按光路顺序）</h3>
+      <div id="lensList"></div>
+      <button type="button" class="add" id="lensAdd">+ 添加元件</button>
+      <h3>观察面与图示</h3>
+      <div class="field"><label>观察面位置 z <span>自起始面起算；双击光路图也可设置</span></label><div class="inputrow"><input id="m_zobs" type="number" value="530" step="any"><span class="unit">mm</span></div></div>
+      <div class="field"><label>图示范围终点 z <span>0 = 自动</span></label><div class="inputrow"><input id="m_zend" type="number" value="0" min="0" step="any"><span class="unit">mm</span></div></div>
+      <div class="field"><label for="m_view">包络显示方向</label><div class="inputrow"><select id="m_view" class="wide"><option value="both">x 与 y 同时显示</option><option value="x">仅 x（水平）方向</option><option value="y">仅 y（竖直）方向</option></select></div></div>
+      <div class="field"><label for="m_raymode">光线画法</label><div class="inputrow"><select id="m_raymode" class="wide"><option value="geo">几何光线（沿入射波前法向，忽略衍射）</option><option value="gauss">高斯光束母线（与 1/e² 包络相切，精确）</option><option value="none">不画光线，仅显示包络</option></select></div></div>
+      <div class="field"><label>每侧光线条数 <span>1–8</span></label><div class="inputrow"><input id="m_rays" type="number" value="4" min="1" max="8" step="1"></div></div>
+      <div class="btnrow"><button class="primary" type="submit">计算光束传输</button><button class="secondary" type="button" id="m_toWaist" title="单方向显示时取该方向束腰；有像散且同时显示 x/y 时取圆形光斑位置">观察面设为末端束腰</button><button class="secondary" type="button" data-copy="multi">复制结果</button><button class="secondary" type="button" data-reset="multiForm">恢复默认</button></div><div id="multiErr" class="error" role="alert"></div>
+    </form>
+    <div class="panel"><h2>计算结果</h2><p class="sub">“末端”指最后一个元件之后的光束；光斑采用 1/e² 直径定义。x、y 两方向结果不同时显示为“x / y”。</p>
+      <div class="resultTop"><div class="metric"><small>观察面光斑直径 x / y</small><strong id="m_o_dobs" class="xy">—</strong><em>μm</em></div><div class="metric"><small>末端束腰直径 x / y</small><strong id="m_o_d0" class="xy">—</strong><em>μm</em></div><div class="metric"><small>末端束腰位置 z x / y</small><strong id="m_o_zw" class="xy">—</strong><em id="m_o_zwrel">mm</em></div><div class="metric"><small>末端瑞利长度 x / y</small><strong id="m_o_zr" class="xy">—</strong><em>mm</em></div></div>
+      <div class="resultTop"><div class="metric"><small>系统等效焦距 EFL x / y</small><strong id="m_o_efl" class="xy">—</strong><em>mm</em></div><div class="metric"><small>后截距 BFL（末元件后）x / y</small><strong id="m_o_bfl" class="xy">—</strong><em>mm</em></div><div class="metric"><small>总效率（口径 × 反射率）</small><strong id="m_o_T" class="xy">—</strong><em>%</em></div><div class="metric"><small>观察面峰值功率密度</small><strong id="m_o_I" class="xy">—</strong><em>MW/cm²</em></div></div>
+      <div class="resultTop"><div class="metric"><small>像散 Δz = z_wy − z_wx</small><strong id="m_o_astig" class="xy">—</strong><em>mm</em></div><div class="metric"><small>圆形光斑位置 z（wx = wy）</small><strong id="m_o_zround" class="xy">—</strong><em>mm</em></div><div class="metric"><small>圆形光斑直径</small><strong id="m_o_dround" class="xy">—</strong><em>μm</em></div><div class="metric"><small>观察面椭圆度 wx / wy</small><strong id="m_o_ell" class="xy">—</strong><em></em></div></div>
+      <div class="resultbox"><h3>展开光路图（光束包络与光线）</h3><div class="chartwrap"><canvas id="rayChart" class="chart raychart" role="img" aria-label="高斯光束通过透镜与反射镜的展开光路 1/e² 包络与光线示意图"></canvas><div id="rayTip" class="charttip" aria-live="polite" hidden></div></div><div class="legend"><span><i class="dot"></i>x（水平）包络</span><span><i class="dot purple"></i>y（竖直）包络（虚线）</span><span><i class="dot orange"></i>光线</span><span><i class="dot" style="background:#1769e0;border-radius:2px"></i>凸透镜</span><span><i class="dot pink" style="border-radius:2px"></i>凹透镜</span><span><i class="dot teal" style="border-radius:2px"></i>凹面镜</span><span><i class="dot brown" style="border-radius:2px"></i>凸面镜</span><span><i class="dot green"></i>观察面</span><span><i class="dot gray"></i>束腰 / 几何焦点 ×</span></div><p class="sub" style="margin:4px 0 0">反射镜画在展开光路的折返点处，短斜线表示镜背；实际光路在该处转折 2θ。无斜入射时 x/y 包络重合，只画一条。横纵比例不同，纵向已放大。悬停查看光斑参数，双击把观察面移到该位置。被口径挡住的光线以红点截止（斜入射镜在子午方向按投影口径 Ø·cosθ 截止）。</p></div>
+      <div class="resultbox"><h3>观察面光斑分布</h3><div class="spotrow"><canvas id="spotMap" width="240" height="240" role="img" aria-label="观察面椭圆高斯光斑二维强度分布与 x、y 截面曲线"></canvas><div class="spotinfo"><div class="range">位置 z = <b id="m_o_zobs2">—</b> mm（<span id="m_o_seg">—</span>）</div><div class="range">1/e² 直径 x / y = <b id="m_o_dobs2">—</b> μm；FWHM = <b id="m_o_fwhm">—</b> μm</div><div class="range">离末端束腰 x / y = <b id="m_o_def">—</b> mm；波前曲率半径 R x / y = <b id="m_o_R">—</b> mm</div><div class="range">峰值功率密度 I₀ = 2P/(π·wx·wy) = <b id="m_o_I2">—</b> W/cm²（已计入口径透过率与反射率）</div><div class="range">图中视场 ±2·max(wx, wy)；白色曲线为水平（x）截面强度，青色曲线为竖直（y）截面强度，虚线椭圆为 1/e² 轮廓。</div></div></div></div>
+      <div id="multiNotice" class="notice"></div>
+      <div class="resultbox"><h3>逐元件光束参数</h3><div class="tablewrap"><table class="modes lens"><thead><tr><th>元件</th><th>等效焦距 fx / fy mm</th><th>位置 z mm</th><th>入射光斑直径 x / y mm</th><th>效率 %（口径 × 反射）</th><th>出射束腰 z x / y mm</th><th>束腰距元件 x / y mm</th><th>出射束腰直径 x / y μm</th><th>瑞利长度 x / y mm</th></tr></thead><tbody id="m_rows"></tbody></table></div><div class="range">“束腰距元件”为正表示实束腰在元件后；为负表示虚束腰。入射光斑直径为垂直于光轴的截面；斜入射镜面上子午方向的光斑足迹再拉长 1/cosθ。</div></div>
+      <div class="resultbox"><h3>公式与适用范围</h3><div class="formula">复参数 q（嵌入 M²，x、y 各一套）：q(z) = (z − z_w) + i·zR，zR = π w₀² / (M² λ)
+自由传输（展开光程）：q₂ = q₁ + d
+薄透镜：1/q₂ = 1/q₁ − 1/f（凸透镜 f &gt; 0，凹透镜 f &lt; 0），fx = fy = f
+球面反射镜（展开为等效透镜）：f = R/2（凹面镜），f = −R/2（凸面镜）
+斜入射角 θ（相对镜面法线，折转角 2θ）：子午 f_t = f·cosθ，弧矢 f_s = f/cosθ
+  水平折叠：fx = f_t，fy = f_s；竖直折叠：fx = f_s，fy = f_t
+光斑半径：w(z) = w₀ √[1 + ((z − z_w)/zR)²]，R(z) = (z − z_w)[1 + (zR/(z − z_w))²]
+口径透过率（椭圆光斑 / 圆口径，斜入射时口径投影为 a·cosθ × a 的椭圆）：
+  T = 1 − (1/2π)∫₀^{2π} exp[−2 / (u²cos²φ + v²sin²φ)] dφ，u = w_x/a_x，v = w_y/a_y
+元件效率 = T × 反射率（透镜仅计 T）；峰值功率密度 I₀ = 2·P·η / (π·wx·wy)
+几何光线（x、y 分别用 fx、fy）：y′ = y，u′ = u − y/f；EFL = −1/C，BFL = −A/C
+圆形光斑位置：解 wx(z) = wy(z)（位于两束腰之间，即像散的“最小弥散圆”附近）
+
+模型：薄透镜 / 薄反射镜、近轴；所有折叠限定为水平或竖直平面内，x、y 方向相互独立（像散主轴不旋转）。斜入射只计入像散（Coddington 关系），未计入彗差等高阶像差，入射角大时应改用离轴抛物面镜或实际光线追迹。正入射（θ = 0）时反射光沿原路返回，实际需配合分光镜或微小折转角。口径只用于计算透过率和截止光线，未计入硬边衍射。未计入热透镜、镀膜相位和装调误差，结果应以光斑仪实测确认。</div></div>
+    </div>
+  </section>
+  <section id="fiber" class="layout hidden">
+    <form class="panel" id="fiberForm"><h2>输入参数</h2><p class="sub">光纤参数采用理想阶跃型弱导光纤模型；绕纤损耗采用 LP 模式宏弯辐射损耗公式。</p>
+      <h3>光纤与波长</h3>
+      <div class="field"><label>纤芯直径 <span>芯半径 a = 直径/2</span></label><div class="inputrow"><input id="f_core" type="number" value="25" min="0.001" step="any"><select id="f_core_u"><option value="um">μm</option><option value="mm">mm</option></select></div></div>
+      <div class="field"><label>数值孔径 NA <span>NA &lt; n₀</span></label><div class="inputrow"><input id="f_na" type="number" value="0.065" min="0.0001" step="any"></div></div>
+      <div class="field"><label>包层折射率 n₂ <span>用于计算 n₁</span></label><div class="inputrow"><input id="f_n2" type="number" value="1.45" min="1" step="any"></div></div>
+      <div class="field"><label>波长 λ</label><div class="inputrow"><input id="f_lambda" type="number" value="1070" min="0.001" step="any"><select id="f_lambda_u"><option value="nm">nm</option><option value="um">μm</option></select></div></div>
+      <h3>绕纤条件</h3>
+      <div class="field"><label>绕纤直径 D</label><div class="inputrow"><input id="f_d" type="number" value="100" min="0.001" step="any"><select id="f_d_u"><option value="mm">mm</option><option value="m">m</option></select></div></div>
+      <div class="field"><label>弹光修正系数 <span>R_eff = 系数 × R；石英 1.28，填 1 关闭</span></label><div class="inputrow"><input id="f_eo" type="number" value="1.28" min="1" max="2" step="any"></div></div>
+      <div class="field"><label>绕纤长度 L</label><div class="inputrow"><input id="f_len" type="number" value="2" min="0.001" step="any"><select id="f_len_u"><option value="m">m</option><option value="mm">mm</option></select></div></div>
+      <div class="field"><label for="f_th">临界损耗阈值 <span>用于反推临界绕纤直径</span></label><div class="inputrow"><input id="f_th" type="number" value="0.1" min="0" step="any"><select disabled aria-label="阈值单位"><option>dB/m</option></select></div></div>
+      <div class="field"><label>模式计算 <span>按 V 数自动列出全部导模</span></label><div class="range">提交后由截止条件自动枚举所有 LPₗₘ 模式，逐一求解 U/W 并计算绕纤损耗，以及损耗等于阈值时的临界绕纤直径（选模绕纤设计用：基模应低于阈值、高阶模应高于阈值）。</div></div>
+      <div class="btnrow"><button class="primary" type="submit">计算光纤参数与绕纤损耗</button><button class="secondary" type="button" data-copy="fiber">复制结果</button><button class="secondary" type="button" data-reset="fiberForm">恢复默认</button></div><div id="fiberErr" class="error" role="alert"></div>
+    </form>
+    <div class="panel"><h2>计算结果</h2><p class="sub">损耗结果为 Marcuse 类宏弯辐射损耗理论估算。</p><div class="resultTop"><div class="metric"><small>V 数</small><strong id="o_v">—</strong><em>无量纲</em></div><div class="metric"><small>接受半角</small><strong id="o_angle">—</strong><em>度</em></div><div class="metric"><small>F 数</small><strong id="o_fnum">—</strong><em>无量纲</em></div><div class="metric"><small>导模数（含偏振/简并）</small><strong id="o_modes">—</strong><em>个</em></div></div><div class="resultTop"><div class="metric"><small>U</small><strong id="o_u">—</strong><em>无量纲</em></div><div class="metric"><small>W</small><strong id="o_w">—</strong><em>无量纲</em></div><div class="metric"><small>弯曲损耗</small><strong id="o_loss">—</strong><em>dB/m</em></div><div class="metric"><small>总绕纤损耗</small><strong id="o_total">—</strong><em>dB</em></div></div><div class="resultbox"><h3>模式和弯曲信息</h3><div class="range">芯层折射率 n₁：<b id="o_n1">—</b>；弯曲半径 R：<b id="o_r">—</b> mm（等效 R_eff：<b id="o_reff">—</b> mm）；绕纤圈数：<b id="o_turns">—</b> 圈</div><div class="range">LP 模式数：<b id="o_lp">—</b>；LP₀₁ 模场直径 MFD（Petermann II）：<b id="o_mfd">—</b> μm；单模截止波长 λc：<b id="o_lamc">—</b> nm；相对折射率差 Δ：<b id="o_delta">—</b>；临界直径阈值：<b id="o_th">—</b> dB/m</div><div id="fiberNotice" class="notice"></div><div class="tablewrap"><table class="modes"><thead><tr><th>模式</th><th>截止 V</th><th>U</th><th>W</th><th>弯曲损耗 dB/m</th><th>本段总损耗 dB</th><th>相对 LP₀₁</th><th>临界绕纤直径 mm</th></tr></thead><tbody id="modeRows"></tbody></table></div></div><div class="resultbox"><h3>绕纤直径—损耗趋势</h3><div class="chartwrap"><canvas id="fiberChart" class="chart fiberchart" role="img" aria-label="各 LP 模式弯曲损耗随绕纤直径变化曲线"></canvas><div id="fiberTip" class="charttip" aria-live="polite" hidden></div></div><div id="fiberLegend" class="legend"></div><p class="sub" style="margin:4px 0 0">纵轴为对数坐标；鼠标移到曲线上或点击可查看该直径下各模式的损耗数值，虚线为当前绕纤直径。</p></div><div class="resultbox"><h3>公式与适用范围</h3><div class="formula">模式求解：U² + W² = V²；U、W 由圆形阶跃光纤 LP 模式边界条件数值求根。
+LP₀₁：U·J₁(U)/J₀(U) = W·K₁(W)/K₀(W)
+LPₗₘ：U·Jₗ₋₁(U)/Jₗ(U) + W·Kₗ₋₁(W)/Kₗ(W) = 0
+
+V = (2πa/λ)√(n₁² − n₂²)
+θmax = asin(NA / n₀)
+F# ≈ 1 / (2 NA)
+导模数：按求得的 LP 模式计数（LP₀ₘ 计 2，LPₗₘ(l≥1) 计 4），大 V 时 ≈ V²/2
+截止：LP₀ₘ 为 J₁ 第 m−1 个零点，LPₗₘ 为 Jₗ₋₁ 第 m 个零点；λc = 2πa·NA / 2.405
+MFD：Petermann II 定义 w² = 2∫ψ²r dr / ∫(dψ/dr)²r dr（与 ITU-T G.650、厂商规格一致）
+
+αbend = √π·κ²·exp(−(2/3)·γ³R/β²) / [eₗ·γ^(3/2)·V²·√R·Kₗ₋₁(W)·Kₗ₊₁(W)]
+κ = U/a，γ = W/a，β² = n₁²k² − κ²，e₀ = 2，eₗ≥₁ = 1（Marcuse 1976）
+弱导近似下指数项 ≈ (4/3)·Δ·(W³/V²)·(R/a)，Δ = (n₁² − n₂²)/(2n₁²)
+
+注意：指数项必须包含 Δ（Δ≈10⁻³ 量级），漏掉 Δ 会使损耗被低估上千个数量级。
+α(dB/m) = 4.343 αbend
+弹光修正：弯曲应力使折射率沿半径方向变化，公式中以等效半径 R_eff = k·R 代入，石英 k ≈ 1.28（Schermer &amp; Cole 2007，p₁₁、p₁₂、ν 推得）
+总损耗(dB) = α(dB/m) × L
+
+适用范围：理想圆形阶跃型、弱导光纤；每个 LP 模式先由特征方程求 U/W，再用宏弯渐近式估算。LP₀₁ 结果最可靠；高阶模式在远离截止且弯曲半径明显大于纤芯半径时仅作趋势估算。未计入微弯、模式耦合、应力、温度、涂覆层、椭圆度和制造误差。实际光纤应以厂商曲线或实测校准。</div></div></div>
+  </section>
+  <section id="splice" class="layout hidden">
+    <form class="panel" id="spliceForm"><h2>输入参数</h2><p class="sub">基模（LP₀₁）熔接损耗采用模场重叠模型；可选多模满注入几何模型。光纤按理想阶跃型弱导光纤处理。</p>
+      <h3>波长</h3>
+      <div class="field"><label>波长 λ</label><div class="inputrow"><input id="p_lambda" type="number" value="1070" min="0.001" step="any"><select id="p_lambda_u"><option value="nm">nm</option><option value="um">μm</option></select></div></div>
+      <div class="fiberbox"><h4>光纤 1（入射侧）</h4>
+        <div class="field"><label>纤芯直径 <span>μm</span></label><div class="inputrow"><input id="p1_core" type="number" value="20" min="0.01" step="any"><span class="unit">μm</span></div></div>
+        <div class="field"><label>数值孔径 NA</label><div class="inputrow"><input id="p1_na" type="number" value="0.065" min="0.0001" step="any"></div></div>
+        <div class="field"><label for="p1_src">模场直径来源</label><div class="inputrow"><select id="p1_src" class="wide"><option value="calc">由纤芯/NA 计算（Petermann II）</option><option value="mfd">使用规格书 MFD</option></select></div></div>
+        <div class="field" data-show="p1_src=mfd"><label>规格书 MFD <span>1/e² 直径</span></label><div class="inputrow"><input id="p1_mfd" type="number" value="17" min="0.01" step="any"><span class="unit">μm</span></div></div>
+      </div>
+      <div class="fiberbox"><h4>光纤 2（出射侧）</h4>
+        <div class="field"><label>纤芯直径 <span>μm</span></label><div class="inputrow"><input id="p2_core" type="number" value="25" min="0.01" step="any"><span class="unit">μm</span></div></div>
+        <div class="field"><label>数值孔径 NA</label><div class="inputrow"><input id="p2_na" type="number" value="0.065" min="0.0001" step="any"></div></div>
+        <div class="field"><label for="p2_src">模场直径来源</label><div class="inputrow"><select id="p2_src" class="wide"><option value="calc">由纤芯/NA 计算（Petermann II）</option><option value="mfd">使用规格书 MFD</option></select></div></div>
+        <div class="field" data-show="p2_src=mfd"><label>规格书 MFD <span>1/e² 直径</span></label><div class="inputrow"><input id="p2_mfd" type="number" value="20" min="0.01" step="any"><span class="unit">μm</span></div></div>
+      </div>
+      <h3>熔接偏差与预算</h3>
+      <div class="field"><label>横向偏移 d <span>两纤芯轴线间距</span></label><div class="inputrow"><input id="p_off" type="number" value="1" min="0" step="any"><span class="unit">μm</span></div></div>
+      <div class="field"><label>轴向倾角 θ <span>两光纤轴线夹角</span></label><div class="inputrow"><input id="p_tilt" type="number" value="0.2" min="0" step="any"><span class="unit">°</span></div></div>
+      <div class="field"><label>介质折射率 n <span>倾角项用，熔接取玻璃折射率</span></label><div class="inputrow"><input id="p_n" type="number" value="1.45" min="1" step="any"></div></div>
+      <div class="field"><label>损耗预算 <span>反推允许偏差</span></label><div class="inputrow"><input id="p_budget" type="number" value="0.3" min="0" step="any"><span class="unit">dB</span></div></div>
+      <div class="btnrow"><button class="primary" type="submit">计算熔接损耗</button><button class="secondary" type="button" data-copy="splice">复制结果</button><button class="secondary" type="button" data-reset="spliceForm">恢复默认</button></div><div id="spliceErr" class="error" role="alert"></div>
+    </form>
+    <div class="panel"><h2>计算结果</h2><p class="sub">基模熔接损耗 = 模场失配 + 横向偏移 + 轴向倾角三项之和（高斯近似下三项相互独立）。</p>
+      <div class="resultTop"><div class="metric"><small>基模熔接总损耗</small><strong id="q_total">—</strong><em>dB</em></div><div class="metric"><small>耦合效率 η</small><strong id="q_eta">—</strong><em>%</em></div><div class="metric"><small>允许横向偏移</small><strong id="q_dmax">—</strong><em>μm（θ 取当前值）</em></div><div class="metric"><small>允许轴向倾角</small><strong id="q_tmax">—</strong><em>°（d 取当前值）</em></div></div>
+      <div class="resultbox"><h3>损耗分解</h3><div class="tablewrap"><table class="modes compact"><thead><tr><th>项目</th><th>耦合效率</th><th>损耗 dB</th><th>占比</th></tr></thead><tbody id="q_rows"></tbody></table></div>
+        <div class="range">光纤 1：V = <b id="q_v1">—</b>，MFD = <b id="q_m1">—</b> μm（<span id="q_s1">—</span>）；光纤 2：V = <b id="q_v2">—</b>，MFD = <b id="q_m2">—</b> μm（<span id="q_s2">—</span>）；MFD 比 = <b id="q_ratio">—</b></div>
+        <div class="range">仅 MFD 失配时允许的最大 MFD 比（损耗 = 预算）：<b id="q_rmax">—</b>；无倾角时允许横向偏移 <b id="q_d0">—</b> μm；无偏移时允许倾角 <b id="q_t0">—</b>°</div>
+        <div class="range" id="q_exact_line">精确 LP₀₁ 场重叠（J₀/K₀ 数值积分，含偏移、不含倾角）：<b id="q_exact">—</b> dB；同条件高斯近似：<b id="q_gref">—</b> dB</div>
+      </div>
+      <div class="resultbox"><h3>损耗随横向偏移变化</h3><div class="chartwrap"><canvas id="spliceChart" class="chart fiberchart" role="img" aria-label="基模熔接损耗（dB）随横向偏移（μm）变化曲线"></canvas><div id="spliceTip" class="charttip" aria-live="polite" hidden></div></div><div class="legend"><span><i class="dot"></i>θ = 0</span><span><i class="dot orange"></i>当前倾角 θ</span><span><i class="dot" style="background:#14804a"></i>精确 LP₀₁ 重叠（θ = 0，仅纤芯/NA 计算时）</span><span><i class="dot" style="background:#ba3030"></i>红色虚线：损耗预算</span></div><p class="sub" style="margin:4px 0 0">灰色竖虚线为当前偏移量。悬停或点击绘图区可查看数值。</p></div>
+      <div id="spliceNotice" class="notice"></div>
+      <div class="resultbox"><h3>多模满注入几何损耗（参考）</h3><div class="range">适用于泵浦光纤等高 V 多模光纤在满注入、模式均匀分布时的熔接估算，结果与传输方向有关。</div><div class="tablewrap"><table class="modes compact"><thead><tr><th>方向</th><th>芯径失配 dB</th><th>NA 失配 dB</th><th>合计 dB</th></tr></thead><tbody id="q_mm"></tbody></table></div><div class="range" id="q_mm_note"></div></div>
+      <div class="resultbox"><h3>公式与适用范围</h3><div class="formula">基模高斯近似（Marcuse 1977），w = MFD/2：
+η_MFD    = [2 w₁ w₂ / (w₁² + w₂²)]²
+η_offset = exp[−2 d² / (w₁² + w₂²)]
+η_tilt   = exp[−2 (π n θ w₁ w₂)² / (λ² (w₁² + w₂²))]
+Loss(dB) = −10·log₁₀(η_MFD · η_offset · η_tilt)
+
+精确重叠：η = |∫ψ₁ψ₂* dA|² / (∫|ψ₁|² dA · ∫|ψ₂|² dA)，ψ 为阶跃光纤 LP₀₁ 场（芯内 J₀，包层 K₀）
+MFD：Petermann II 定义，与光纤页一致；选“规格书 MFD”时直接使用输入值
+
+多模满注入（几何光学，均匀模式分布）：
+芯径项 = −10·log₁₀[(a₂/a₁)²]，仅 a₂ < a₁ 时计入
+NA 项  = −10·log₁₀[(NA₂/NA₁)²]，仅 NA₂ < NA₁ 时计入
+
+适用范围：理想阶跃型、弱导光纤，熔接点无间隙、端面平整；高斯近似对 V≈1.8–2.4 的单模光纤误差很小，V 偏离该范围时请参考精确重叠结果。LMA 光纤（V &gt; 2.405）的结果为 LP₀₁ → LP₀₁ 的基模传输损耗；未耦合进出射光纤基模的功率会激发高阶模或进入包层，不一定全部损失，但会劣化光束质量。高斯模型的损耗对两个方向相同，实际 OTDR 单向测量会因 MFD 不同出现“增益/损耗”假象，需双向平均。未计入熔接拉锥、热扩芯、纤芯同心度、端面切割角和应力等因素。</div></div>
+    </div>
+  </section>
+  <div class="footer"><a href="guide.html">使用说明与发布记录</a> · v0.1.0 · 尚未完成独立模型验证<br>本工具用于工程估算和方案比较，不替代器件厂商额定值、详细光学仿真或安全评估。</div>
+</div>
+<script src="assets/calculator.js"></script>
+<script src="assets/site.js"></script>
+</body></html>
