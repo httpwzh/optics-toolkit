@@ -6,6 +6,8 @@
   status.className = 'site-status'; status.setAttribute('role', 'status');
   document.querySelector('.tabs').after(status);
   const tell = text => { status.textContent = text; };
+  // Usage events carry only an action name and a tool name, never input values.
+  const track = (action, tool) => document.dispatchEvent(new CustomEvent('site:track', {detail:{action, tool}}));
   const initial = {};
   keys.forEach(k => { initial[k] = {}; fieldsOf(FORMS[k].form).forEach(e => { if (e.id in defaults) initial[k][e.id] = defaults[e.id]; }); });
   function snapshot(k) {
@@ -43,8 +45,12 @@
         Object.entries(s.values).forEach(([id,v]) => { $(id).value = v; });
         applyShow(); selectTab(k); run(k); saveState();
         tell('已载入分享参数。请核对输入、单位和模型适用范围。');
-      } catch(e) { tell('未载入分享参数：' + e.message + '。请使用完整有效的链接。'); return; }
+      } catch(e) { tell('未载入分享参数：' + e.message + '。请使用完整有效的链接。'); k = active(); }
+      // Remove parameters from the address once read, so they never reach analytics or later copies.
+      history.replaceState(null, '', '#tool=' + (keys.includes(k) ? k : active()));
+      track('share-open', k);
     }
+    if (keys.includes(k)) track('view', k);
     if (keys.includes(k)) { selectTab(k); saveState(); }
   }
   function download(blob, name) {
@@ -61,11 +67,13 @@
       const s = snapshot(k), url = new URL(location.href); url.search = '';
       url.hash = new URLSearchParams({tool:k, state:JSON.stringify(s)}).toString();
       if (url.href.length > 24000) { tell('参数链接过长，无法分享。'); return; }
+      track('share', k);
       try { await navigator.clipboard.writeText(url.href); tell('参数链接已复制。'); }
       catch { prompt('请复制参数链接：',url.href); }
     }), button('下载结果文本', () => {
       run(k); if (!lastResults[k]) { tell('请先修正输入错误。'); return; }
-      download(new Blob(['光学工程工具箱 v0.1.0\n工程估算，非实测结果\n\n'+toTSV(lastResults[k])+'\n\n模型与风险提示\n'+[...$(k).querySelectorAll('.notice,.formula')].map(e=>e.textContent).join('\n')+'\n\n更多限制请参见本站使用说明。'],  {type:'text/plain;charset=utf-8'}), 'optics-'+k+'.txt');
+      track('download-text', k);
+      download(new Blob(['光学工程工具箱 v0.1.1\n工程估算，非实测结果\n\n'+toTSV(lastResults[k])+'\n\n模型与风险提示\n'+[...$(k).querySelectorAll('.notice,.formula')].map(e=>e.textContent).join('\n')+'\n\n更多限制请参见本站使用说明。'],  {type:'text/plain;charset=utf-8'}), 'optics-'+k+'.txt');
     }));
     $(FORMS[k].form).append(row);
   });
@@ -73,6 +81,7 @@
     cv.after(button('下载此图 PNG', () => {
       const k = cv.closest('section.layout').id; run(k);
       if (!lastResults[k]) { tell('输入无效，无法导出图表。'); return; }
+      track('download-png', k);
       const out = document.createElement('canvas'); out.width=cv.width; out.height=cv.height;
       const c=out.getContext('2d'); c.fillStyle='#fff'; c.fillRect(0,0,out.width,out.height); c.drawImage(cv,0,0);
       out.toBlob(blob => { if(blob) download(blob, 'optics-'+cv.id+'.png'); }, 'image/png');
@@ -82,6 +91,11 @@
     b.addEventListener('click', () => { location.hash = 'tool='+b.dataset.tab; });
     b.addEventListener('keydown', e => { if(['ArrowLeft','ArrowRight'].includes(e.key)) location.hash='tool='+active(); });
   });
+  // Count a tool as "used" once per page load, when the visitor first edits or submits it.
+  const used = new Set();
+  keys.forEach(k => ['input','submit'].forEach(t => $(FORMS[k].form).addEventListener(t, () => {
+    if (!used.has(k)) { used.add(k); track('use', k); }
+  })));
   // Avoid leaving old shared parameters in the address after editing them.
   document.querySelectorAll('form').forEach(f => f.addEventListener('input', () => {
     if (location.hash.includes('state=')) history.replaceState(null,'','#tool='+active());
