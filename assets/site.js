@@ -34,11 +34,14 @@
     return s;
   }
   function route() {
-    const p = new URLSearchParams(location.hash.slice(1));
+    // The <head> snippet may have moved share parameters out of the address before analytics loaded.
+    const raw = window.__shareHash || location.hash;
+    window.__shareHash = null;
+    const p = new URLSearchParams(raw.slice(1));
     let k = p.get('tool');
     if (p.has('state')) {
       try {
-        if (location.hash.length > 24000) throw Error('链接过长');
+        if (raw.length > 24000) throw Error('链接过长');
         const s = validate(JSON.parse(p.get('state'))); k = s.tool;
         Object.entries(initial[k]).forEach(([id,v]) => { $(id).value = v; });
         if (k === 'multi') renderLenses(s.lenses);
@@ -50,9 +53,12 @@
       history.replaceState(null, '', '#tool=' + (keys.includes(k) ? k : active()));
       track('share-open', k);
     }
-    if (keys.includes(k)) track('view', k);
     if (keys.includes(k)) { selectTab(k); saveState(); }
+    // One page view per tool shown; the bare homepage counts as the tool it opens on.
+    const shown = keys.includes(k) ? k : active();
+    if (shown !== lastView) { lastView = shown; track('view', shown); }
   }
+  let lastView = null;
   function download(blob, name) {
     const url = URL.createObjectURL(blob), a = document.createElement('a');
     a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 2000);

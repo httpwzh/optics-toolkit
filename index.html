@@ -8,6 +8,23 @@
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="assets/calculator.css">
 <link rel="stylesheet" href="assets/site.css">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  if (/(^#|&)state=/.test(location.hash)) {
+    window.__shareHash = location.hash;
+    var t = new URLSearchParams(location.hash.slice(1)).get('tool');
+    history.replaceState(null, '', location.pathname + location.search + (t ? '#tool=' + encodeURIComponent(t) : ''));
+  }
+  if (navigator.doNotTrack === '1' || window.doNotTrack === '1' || location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
+  window.__analytics = true;
+  _hmt.push(['_setAutoPageview', false]);
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?0bd84dd095bb5421b968885cc74d3f28";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 </head>
 <body>
 <a class="skip-link" href="#tools">跳转到计算工具</a>
